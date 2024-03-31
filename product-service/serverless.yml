@@ -1,11 +1,8 @@
 service: product-service
-# app and org for use with dashboard.serverless.com
-#app: your-app-name
-#org: your-org-name
 frameworkVersion: "3"
 
-# Add the serverless-webpack plugin
 plugins:
+  - serverless-auto-swagger
   - serverless-webpack
   - serverless-offline
 
@@ -17,25 +14,22 @@ custom:
 provider:
   name: aws
   runtime: nodejs20.x
-  region: "us-west-1"
+  region: "eu-west-1"
+  stage: ${opt:stage, 'dev'}
+  httpApi:
+    cors: true
 
 functions:
   getProductById:
     handler: handler.getProductById
     events:
       - httpApi:
-          method: get
+          method: GET
           path: /products/{productId}
-          cors: true
-          request:
-            parameters:
-              paths:
-                productId: true
 
   getAllProducts:
     handler: handler.getAllProducts
     events:
       - httpApi:
-          method: get
+          method: GET
           path: /products
-          cors: true

@@ -30,7 +30,6 @@ module.exports = {
                     },
                   },
                 ],
-                // "babel-preset-stage-1",
               ],
             },
           },

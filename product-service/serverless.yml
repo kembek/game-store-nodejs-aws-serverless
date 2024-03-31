@@ -6,18 +6,23 @@ plugins:
   - serverless-webpack
   - serverless-offline
 
-custom:
-  webpack:
-    webpackConfig: "webpack.config.js"
-    includeModules: true
-
 provider:
   name: aws
   runtime: nodejs20.x
   region: "eu-west-1"
   stage: ${opt:stage, 'dev'}
+  apiGateway:
+    apiKeySourceType: HEADER
+    minimumCompressionSize: 1024
+
   httpApi:
     cors: true
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  webpack:
+    webpackConfig: "webpack.config.js"
+    includeModules: true
 
 functions:
   getProductById:
@@ -25,11 +30,11 @@ functions:
     events:
       - httpApi:
           method: GET
-          path: /products/{productId}
+          path: /${self:custom.stage}/products/{productId}
 
   getAllProducts:
     handler: handler.getAllProducts
     events:
       - httpApi:
           method: GET
-          path: /products
+          path: /${self:custom.stage}/products

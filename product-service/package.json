@@ -12,6 +12,7 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "serverless-offline": "^13.3.3",
     "serverless-webpack": "^5.13.0",
     "webpack": "^4.47.0"
   },

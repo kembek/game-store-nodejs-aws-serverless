@@ -76,7 +76,7 @@ async function main() {
     await client.send(new CreateTableCommand(StocksTableDetails));
     logSuccessfullyCreatingTable(StocksTableDetails.TableName);
   } catch (error) {
-    console.error(error.message);
+    console.error("Error: ", error);
   } finally {
     client.destroy();
   }

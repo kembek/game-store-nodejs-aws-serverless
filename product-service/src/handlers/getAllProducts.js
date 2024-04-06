@@ -1,5 +1,5 @@
-import { formatJSONResponse } from "./utils";
-import { availableProducts } from "./mock/data";
+import { formatJSONResponse } from "../utils";
+import { availableProducts } from "../mock/data";
 
 export const getAllProductsHandler = async () => {
   try {

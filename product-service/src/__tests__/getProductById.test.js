@@ -1,7 +1,7 @@
-import { getProductById } from "../getProductById";
+import { getProductByIdHandler } from "../handlers/getProductById";
 
-describe("getProductById", () => {
+describe("getProductByIdHandler", () => {
   it("Should return response", async () => {
-    expect(await getProductById()).toBeTruthy();
+    expect(await getProductByIdHandler({ pathParameters: "1" })).toBeTruthy();
   });
 });

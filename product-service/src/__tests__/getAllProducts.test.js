@@ -1,4 +1,4 @@
-import { getAllProductsHandler } from "../getAllProducts";
+import { getAllProductsHandler } from "../handlers/getAllProducts";
 
 describe("getAllProductsHandler", () => {
   it("Should return response", async () => {

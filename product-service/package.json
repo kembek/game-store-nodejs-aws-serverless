@@ -7,7 +7,8 @@
     "deploy": "sls deploy",
     "remove": "sls remove",
     "doc": "sls generate-swagger",
-    "test": "jest"
+    "test": "jest",
+    "create:table": "node scripts/createTable.js"
   },
   "devDependencies": {
     "@babel/core": "^7.24.3",
@@ -24,5 +25,8 @@
     "webpack": "^4.47.0"
   },
   "author": "The serverless webpack authors (https://github.com/elastic-coders/serverless-webpack)",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.549.0"
+  }
 }

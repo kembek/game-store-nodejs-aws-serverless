@@ -2,6 +2,7 @@ import { formatJSONResponse } from "../utils";
 import { ProductService } from "../services";
 
 export const getAllProductsHandler = async () => {
+  console.log("*** getAllProductsHandler");
   const productService = new ProductService();
 
   try {

@@ -2,6 +2,7 @@ import { ProductService } from "../services";
 import { formatJSONResponse } from "../utils";
 
 export const getProductByIdHandler = async (event) => {
+  console.log("*** getProductByIdHandler: ", event);
   const { productId } = event.pathParameters || {};
   const productService = new ProductService();
 

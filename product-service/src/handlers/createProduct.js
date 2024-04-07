@@ -10,6 +10,7 @@ const schema = joi.object({
 });
 
 export const createProductHandler = async (event) => {
+  console.log("*** createProductHandler: ", event);
   const productService = new ProductService();
 
   try {

@@ -54,3 +54,10 @@ functions:
       - httpApi:
           method: GET
           path: /${self:custom.stage}/products
+
+  createProduct:
+    handler: handler.createProduct
+    events:
+      - httpApi:
+          method: POST
+          path: /${self:custom.stage}/products

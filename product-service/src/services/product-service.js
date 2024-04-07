@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import DynamoDBService from "./dynamodb-service";
 
 const PRODUCT_TABLE_NAME = "products";
@@ -64,6 +65,44 @@ class ProductService extends DynamoDBService {
     const stock = formatItem(stockResponse.Item);
 
     return this.joinProductByStockCount(product, stock);
+  }
+
+  async createProduct(productParams) {
+    const id = uuidv4();
+    const { title, description, price, count } = productParams;
+
+    const productInput = {
+      TableName: PRODUCT_TABLE_NAME,
+      Item: {
+        ID: {
+          S: id,
+        },
+        Title: {
+          S: title,
+        },
+        Description: {
+          S: description,
+        },
+        Price: {
+          N: `${price}`,
+        },
+      },
+    };
+    const countInput = {
+      TableName: STOCK_TABLE_NAME,
+      Item: {
+        Product_ID: {
+          S: id,
+        },
+        Count: {
+          N: `${count}`,
+        },
+      },
+    };
+
+    return await this.createWithTransaction({
+      TransactItems: [{ Put: productInput }, { Put: countInput }],
+    });
   }
 
   joinProductByStockCount(product, stock) {

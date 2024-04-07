@@ -3,6 +3,7 @@ import {
   ScanCommand,
   PutItemCommand,
   GetItemCommand,
+  TransactWriteItemsCommand,
 } from "@aws-sdk/client-dynamodb";
 
 const DEFAULT_REGION = "eu-west-1";
@@ -24,6 +25,10 @@ class DynamoDBService {
 
   async create(input) {
     return await this.dynamoDBClient.send(new PutItemCommand(input));
+  }
+
+  async createWithTransaction(input) {
+    return await this.dynamoDBClient.send(new TransactWriteItemsCommand(input));
   }
 
   destroy() {

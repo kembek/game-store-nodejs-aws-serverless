@@ -1,8 +1,12 @@
 import { formatJSONResponse } from "../utils";
-import { availableProducts } from "../mock/data";
+import { ProductService } from "../services";
 
 export const getAllProductsHandler = async () => {
+  const productService = new ProductService();
+
   try {
+    const availableProducts = await productService.getAllProducts();
+
     return formatJSONResponse(availableProducts);
   } catch (error) {
     const body = {
@@ -10,5 +14,7 @@ export const getAllProductsHandler = async () => {
     };
 
     return formatJSONResponse(body, 500);
+  } finally {
+    productService.destroy();
   }
 };

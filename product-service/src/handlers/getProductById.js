@@ -1,13 +1,12 @@
-import { availableProducts } from "../mock/data";
+import { ProductService } from "../services";
 import { formatJSONResponse } from "../utils";
 
 export const getProductByIdHandler = async (event) => {
   const { productId } = event.pathParameters || {};
+  const productService = new ProductService();
 
   try {
-    const foundProduct = availableProducts.find(
-      (product) => product.id.toLowerCase() === productId.toLowerCase()
-    );
+    const foundProduct = await productService.getProductById(productId);
 
     if (!foundProduct) {
       return formatJSONResponse(
@@ -25,5 +24,7 @@ export const getProductByIdHandler = async (event) => {
     };
 
     return formatJSONResponse(body, 500);
+  } finally {
+    productService.destroy();
   }
 };

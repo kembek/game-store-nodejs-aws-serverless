@@ -15,19 +15,11 @@ const ProductsTableDetails = {
       AttributeName: "ID",
       AttributeType: "S",
     },
-    {
-      AttributeName: "Title",
-      AttributeType: "S",
-    },
   ],
   KeySchema: [
     {
       AttributeName: "ID",
       KeyType: "HASH",
-    },
-    {
-      AttributeName: "Title",
-      KeyType: "RANGE",
     },
   ],
   ProvisionedThroughput: {
@@ -43,19 +35,11 @@ const StocksTableDetails = {
       AttributeName: "Product_ID",
       AttributeType: "S",
     },
-    {
-      AttributeName: "Count",
-      AttributeType: "N",
-    },
   ],
   KeySchema: [
     {
       AttributeName: "Product_ID",
       KeyType: "HASH",
-    },
-    {
-      AttributeName: "Count",
-      KeyType: "RANGE",
     },
   ],
   ProvisionedThroughput: {

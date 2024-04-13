@@ -1,0 +1,40 @@
+service: product-service
+frameworkVersion: "3"
+
+plugins:
+  - serverless-auto-swagger
+  - serverless-webpack
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: "eu-west-1"
+  stage: ${opt:stage, 'dev'}
+  apiGateway:
+    apiKeySourceType: HEADER
+    minimumCompressionSize: 1024
+
+  httpApi:
+    cors: true
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  webpack:
+    webpackConfig: "webpack.config.js"
+    includeModules: true
+
+functions:
+  getProductById:
+    handler: handler.getProductById
+    events:
+      - httpApi:
+          method: GET
+          path: /${self:custom.stage}/products/{productId}
+
+  getAllProducts:
+    handler: handler.getAllProducts
+    events:
+      - httpApi:
+          method: GET
+          path: /${self:custom.stage}/products

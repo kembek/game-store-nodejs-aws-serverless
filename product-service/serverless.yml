@@ -18,6 +18,22 @@ provider:
   httpApi:
     cors: true
 
+  iam:
+    role:
+      name: "DynamoDB"
+      statements:
+        - Effect: "Allow"
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - "arn:aws:dynamodb:eu-west-1:381492192203:table/products"
+            - "arn:aws:dynamodb:eu-west-1:381492192203:table/stocks"
+
 custom:
   stage: ${opt:stage, self:provider.stage}
   webpack:
@@ -37,4 +53,11 @@ functions:
     events:
       - httpApi:
           method: GET
+          path: /${self:custom.stage}/products
+
+  createProduct:
+    handler: handler.createProduct
+    events:
+      - httpApi:
+          method: POST
           path: /${self:custom.stage}/products

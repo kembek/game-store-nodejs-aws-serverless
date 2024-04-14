@@ -12,18 +12,17 @@ provider:
   stage: ${opt:stage, 'dev'}
   environment:
     BUCKET_NAME: game-store-nodejs-aws-assets
-    ASSET_FOLDER_NAME: uploaded
+    ASSET_FROM_FOLDER: uploaded
+    ASSET_TO_FOLDER: parsed
   httpApi:
     cors: true
   iam:
     role:
-      name: "S3-assets-uploader"
       statements:
         - Effect: "Allow"
           Action:
             - "s3:*"
-          Resource:
-            - "arn:aws:s3:::${self.provider.environment.bucketName}"
+          Resource: "arn:aws:s3:::game-store-nodejs-aws-assets/*"
 
 custom:
   webpack:
@@ -37,3 +36,13 @@ functions:
       - httpApi:
           method: get
           path: /${self:provider.stage}/import
+
+  importFileParser:
+    handler: handler.importFileParser
+    events:
+      - s3:
+          bucket: ${self:provider.environment.BUCKET_NAME}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: ${self:provider.environment.ASSET_FROM_FOLDER}
+          existing: true

@@ -1,9 +1,10 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { formatJSONResponse } from "../utils";
+import { formatJSONResponse, getConfig } from "../utils";
 
 export const importProductsFileHandler = async (event) => {
-  const s3Client = new S3Client({ region: process.env.AWS_REGION });
+  const { region, assetFromFolderName, bucketName } = getConfig();
+  const s3Client = new S3Client({ region });
 
   try {
     const fileName = event.queryStringParameters?.fileName;
@@ -13,10 +14,13 @@ export const importProductsFileHandler = async (event) => {
     }
 
     const command = new PutObjectCommand({
-      Bucket: process.env.BUCKET_NAME,
-      Key: `${process.env.ASSET_FOLDER_NAME}/${fileName}`,
+      Bucket: bucketName,
+      Key: `${assetFromFolderName}/${fileName}`,
+      ContentType: "text/csv",
     });
-    const signedURL = await getSignedUrl(s3Client, command, { expiresIn: 60 });
+    const signedURL = await getSignedUrl(s3Client, command, {
+      expiresIn: 60,
+    });
 
     return formatJSONResponse({ signedURL });
   } catch (error) {

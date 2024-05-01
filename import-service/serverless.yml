@@ -1,0 +1,48 @@
+service: import-service
+frameworkVersion: "3"
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: "eu-west-1"
+  stage: ${opt:stage, 'dev'}
+  environment:
+    BUCKET_NAME: game-store-nodejs-aws-assets
+    ASSET_FROM_FOLDER: uploaded
+    ASSET_TO_FOLDER: parsed
+  httpApi:
+    cors: true
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "s3:*"
+          Resource: "arn:aws:s3:::game-store-nodejs-aws-assets/*"
+
+custom:
+  webpack:
+    webpackConfig: "webpack.config.js"
+    includeModules: true
+
+functions:
+  importProductsFile:
+    handler: handler.importProductsFile
+    events:
+      - httpApi:
+          method: get
+          path: /${self:provider.stage}/import
+
+  importFileParser:
+    handler: handler.importFileParser
+    events:
+      - s3:
+          bucket: ${self:provider.environment.BUCKET_NAME}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: ${self:provider.environment.ASSET_FROM_FOLDER}
+          existing: true

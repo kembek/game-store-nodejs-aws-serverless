@@ -4,14 +4,17 @@ import {
   DeleteObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 import csv from "csv-parser";
 import { finished } from "stream/promises";
 import { formatJSONResponse, getConfig } from "../utils";
 
+const { region, assetFromFolderName, assetToFolderName, sqsUrl } = getConfig();
+
 export const importFileParserHandler = async (event) => {
   console.log("*** Event: ", event);
-  const { region, assetFromFolderName, assetToFolderName } = getConfig();
   const s3Client = new S3Client({ region });
+  const sqsClient = new SQSClient({ region });
 
   try {
     await Promise.all(
@@ -47,6 +50,16 @@ export const importFileParserHandler = async (event) => {
             .on("end", () => console.log("Parsing CSV completed", parsedCSV))
         );
 
+        const messages = parsedCSV.map((item) =>
+          sqsClient.send(
+            new SendMessageCommand({
+              QueueUrl: sqsUrl,
+              MessageBody: JSON.stringify(item),
+            })
+          )
+        );
+        await Promise.all(messages);
+
         const copyToPath = key.replace(assetFromFolderName, assetToFolderName);
         console.log("### copyToPath: ", copyToPath);
 
@@ -78,5 +91,6 @@ export const importFileParserHandler = async (event) => {
     return formatJSONResponse(body, 500);
   } finally {
     s3Client.destroy();
+    sqsClient.destroy();
   }
 };

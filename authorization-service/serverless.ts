@@ -1,14 +1,19 @@
 import type { AWS } from "@serverless/typescript";
 
-import hello from "@functions/hello";
+import basicAuthorizer from "@functions/basicAuthorizer";
 
 const serverlessConfiguration: AWS = {
   service: "authorization-service",
   frameworkVersion: "3",
-  plugins: ["serverless-esbuild", "serverless-offline"],
+  plugins: [
+    "serverless-esbuild",
+    "serverless-dotenv-plugin",
+    "serverless-offline",
+  ],
   provider: {
     name: "aws",
-    runtime: "nodejs14.x",
+    runtime: "nodejs20.x",
+    region: "eu-west-1",
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -19,7 +24,7 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { hello },
+  functions: { basicAuthorizer },
   package: { individually: true },
   custom: {
     esbuild: {
@@ -27,7 +32,7 @@ const serverlessConfiguration: AWS = {
       minify: false,
       sourcemap: true,
       exclude: ["aws-sdk"],
-      target: "node14",
+      target: "node20",
       define: { "require.resolve": undefined },
       platform: "node",
       concurrency: 10,

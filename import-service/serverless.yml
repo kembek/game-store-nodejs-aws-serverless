@@ -14,6 +14,7 @@ provider:
     BUCKET_NAME: game-store-nodejs-aws-assets
     ASSET_FROM_FOLDER: uploaded
     ASSET_TO_FOLDER: parsed
+    SQS_URL: "https://sqs.eu-west-1.amazonaws.com/381492192203/catalogItemsQueue"
   httpApi:
     cors: true
   iam:
@@ -23,6 +24,10 @@ provider:
           Action:
             - "s3:*"
           Resource: "arn:aws:s3:::game-store-nodejs-aws-assets/*"
+        - Effect: "Allow"
+          Action:
+            - "sqs:SendMessage"
+          Resource: "arn:aws:sqs:eu-west-1:381492192203:catalogItemsQueue"
 
 custom:
   webpack:

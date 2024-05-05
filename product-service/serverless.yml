@@ -11,6 +11,10 @@ provider:
   runtime: nodejs20.x
   region: "eu-west-1"
   stage: ${opt:stage, 'dev'}
+
+  environment:
+    TOPIC_NAME: !Ref createProductTopic
+
   apiGateway:
     apiKeySourceType: HEADER
     minimumCompressionSize: 1024
@@ -33,12 +37,38 @@ provider:
           Resource:
             - "arn:aws:dynamodb:eu-west-1:381492192203:table/products"
             - "arn:aws:dynamodb:eu-west-1:381492192203:table/stocks"
+        - Effect: "Allow"
+          Action:
+            - "sns:Publish"
+          Resource:
+            - Ref: "createProductTopic"
 
 custom:
   stage: ${opt:stage, self:provider.stage}
   webpack:
     webpackConfig: "webpack.config.js"
     includeModules: true
+
+resources:
+  Resources:
+    catalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: "catalogItemsQueue"
+        MessageRetentionPeriod: 60
+
+    createProductTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: "createProductTopic"
+
+    emailSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Protocol: "email"
+        Endpoint: "beknazar.zevs@gmail.com"
+        TopicArn:
+          Ref: "createProductTopic"
 
 functions:
   getProductById:
@@ -61,3 +91,20 @@ functions:
       - httpApi:
           method: POST
           path: /${self:custom.stage}/products
+
+  catalogBatchProcess:
+    handler: handler.catalogBatchProcess
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - catalogItemsQueue
+              - Arn
+          batchSize: 5
+      - sns:
+          arn: !Ref createProductTopic
+          topicName: createProductTopic
+          filterPolicyScope: MessageBody
+          filterPolicy:
+            price:
+              - 111

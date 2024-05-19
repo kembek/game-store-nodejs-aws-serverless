@@ -13,7 +13,7 @@ provider:
   stage: ${opt:stage, 'dev'}
 
   environment:
-    TOPIC_NAME: !Ref createProductTopic
+    TOPIC_ARN: !Ref createProductTopic
 
   apiGateway:
     apiKeySourceType: HEADER
@@ -39,7 +39,17 @@ provider:
             - "arn:aws:dynamodb:eu-west-1:381492192203:table/stocks"
         - Effect: "Allow"
           Action:
-            - "sns:Publish"
+            - sqs:SendMessage
+            - sqs:ReceiveMessage
+            - sqs:DeleteMessage
+            - sqs:GetQueueUrl
+          Resource:
+            - Fn::GetAtt:
+                - catalogItemsQueue
+                - Arn
+
+        - Effect: "Allow"
+          Action: sns:Publish
           Resource:
             - Ref: "createProductTopic"
 
@@ -69,6 +79,32 @@ resources:
         Endpoint: "beknazar.zevs@gmail.com"
         TopicArn:
           Ref: "createProductTopic"
+
+    highPriceEmailSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Protocol: "email"
+        Endpoint: "beknazar.zevs@gmail.com"
+        TopicArn:
+          Ref: "createProductTopic"
+        FilterPolicy:
+          price:
+            - numeric:
+                - ">"
+                - 100
+
+    lowPriceEmailSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Protocol: "email"
+        Endpoint: "beknazar.zevs@gmail.com"
+        TopicArn:
+          Ref: "createProductTopic"
+        FilterPolicy:
+          price:
+            - numeric:
+                - "<="
+                - 100
 
 functions:
   getProductById:
@@ -103,8 +139,4 @@ functions:
           batchSize: 5
       - sns:
           arn: !Ref createProductTopic
-          topicName: createProductTopic
-          filterPolicyScope: MessageBody
-          filterPolicy:
-            price:
-              - 111
+          topicName: "createProductTopic"

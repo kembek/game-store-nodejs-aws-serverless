@@ -100,9 +100,16 @@ class ProductService extends DynamoDBService {
       },
     };
 
-    return await this.createWithTransaction({
+    await this.createWithTransaction({
       TransactItems: [{ Put: productInput }, { Put: countInput }],
     });
+
+    return {
+      ...productParams,
+      id,
+      price: +price,
+      count: +count,
+    };
   }
 
   joinProductByStockCount(product, stock) {

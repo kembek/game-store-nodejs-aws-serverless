@@ -17,6 +17,13 @@ provider:
     SQS_URL: "https://sqs.eu-west-1.amazonaws.com/381492192203/catalogItemsQueue"
   httpApi:
     cors: true
+    authorizers:
+      basicAuthorizer:
+        type: request
+        resultTtlInSeconds: 60
+        identitySource:
+          - $request.header.Authorization
+        functionArn: arn:aws:lambda:eu-west-1:381492192203:function:authorization-service-dev-basicAuthorizer
   iam:
     role:
       statements:
@@ -41,6 +48,8 @@ functions:
       - httpApi:
           method: get
           path: /${self:provider.stage}/import
+          authorizer:
+            name: basicAuthorizer
 
   importFileParser:
     handler: handler.importFileParser

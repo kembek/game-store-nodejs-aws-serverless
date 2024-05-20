@@ -29,7 +29,9 @@ provider:
       statements:
         - Effect: "Allow"
           Action:
-            - "s3:*"
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
           Resource: "arn:aws:s3:::game-store-nodejs-aws-assets/*"
         - Effect: "Allow"
           Action:

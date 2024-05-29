@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS orders (
 	payment json,
 	delivery json,
 	comments text,
-	"status" status,
-	total integer DEFAULT 0
+	"status" text,
+	total numeric(10, 2) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users (
